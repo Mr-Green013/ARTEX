@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 import { api } from "@/lib/api";
+import { MOCK } from "@/lib/mock/enabled";
 import type {
   Activity,
   Agent,
@@ -40,6 +41,8 @@ import type {
   UsageStats,
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+import { DemoWalkthrough } from "./demo-walkthrough";
 
 // ── chart constants ───────────────────────────────────────────────────────────
 
@@ -67,6 +70,15 @@ function fmtTokens(n: number): string {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
   if (n >= 1000) return (n / 1000).toFixed(1) + "k";
   return String(n);
+}
+
+function tokenCutoff(days: number, sampleDates: string[]): string {
+  // Use the last recorded day as the end of the demo's chart range.
+  const lastSample = MOCK ? sampleDates.sort().at(-1) : undefined;
+  const end = lastSample ? new Date(lastSample) : new Date();
+  if (lastSample) end.setUTCDate(end.getUTCDate() - days);
+  else end.setDate(end.getDate() - days);
+  return end.toISOString().slice(0, 10);
 }
 
 const ASSET_TYPE_LABELS: Record<string, string> = {
@@ -424,9 +436,7 @@ export default function DashboardPage() {
 
   // 旧版每日：把任务/会话的总量按其创建日期归桶（近似，非真实每日消耗）。
   const dailyTokenDataOld = React.useMemo(() => {
-    const now = new Date();
-    now.setDate(now.getDate() - tokenDays);
-    const cutoff = now.toISOString().slice(0, 10);
+    const cutoff = tokenCutoff(tokenDays, [...tasks, ...convTokens].map((item) => item.created_at.slice(0, 10)));
     const m = new Map<string, { input: number; output: number; cacheRead: number }>();
     const fold = (date: string, inp: number, out: number, cr: number) => {
       if (date < cutoff) return;
@@ -451,11 +461,10 @@ export default function DashboardPage() {
 
   // 新版每日：来自 llm_usage 的真实每日消耗（ts 是实际调用时刻）。
   const dailyTokenDataNew = React.useMemo(() => {
-    const now = new Date();
-    now.setDate(now.getDate() - tokenDays);
-    const cutoff = now.toISOString().slice(0, 10);
+    const daily = usageStats?.daily ?? [];
+    const cutoff = tokenCutoff(tokenDays, daily.map((item) => item.date));
     const m = new Map<string, { input: number; output: number; cacheRead: number }>();
-    for (const d of usageStats?.daily ?? []) {
+    for (const d of daily) {
       if (d.date < cutoff) continue;
       if (tokenTab !== "all" && (profileIdByName.get(d.profile_name) ?? defaultProfileId) !== tokenTab) continue;
       const prev = m.get(d.date) ?? { input: 0, output: 0, cacheRead: 0 };
@@ -497,9 +506,13 @@ export default function DashboardPage() {
       <div>
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Overview</h1>
-          <p className="text-xs text-muted-foreground">System Global Status · Live Refresh</p>
+          <p className="text-xs text-muted-foreground">
+            {MOCK ? "Acme assessment snapshot" : "System Global Status · Live Refresh"}
+          </p>
         </div>
       </div>
+
+      {MOCK && <DemoWalkthrough />}
 
       {/* ── Row 1: 5 stat cards ── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">

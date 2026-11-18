@@ -4,6 +4,22 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 🌐 **Live Demo**: https://artex-demo.vercel.app/
 
+## Run the guided demo locally
+
+From the repository root with Node.js 20.9+ and npm:
+
+```bash
+cd web
+npm ci
+npm run dev:demo
+```
+
+On Windows PowerShell, run `$env:NEXT_PUBLIC_MOCK = "1"; npm run dev -- --hostname 127.0.0.1` in place of `npm run dev:demo`.
+
+Open http://127.0.0.1:3000. The dashboard guide links to the recorded task session, the order access finding with baseline and proof traffic, and the approval queue. Expand **request #95** for the evidence summary, choose **Allow** or **Reject**, and inspect the result in the history. Reload the page to replay the scenario from the beginning.
+
+The walkthrough uses browser-side fixtures. Approvals are simulated in memory. The demo needs no Go server, database, or LLM credentials. To build and serve the optimized demo, run `npm run build:demo` and then `npm start -- --hostname 127.0.0.1` in `web`.
+
 ---
 
 ## Screenshot Overview

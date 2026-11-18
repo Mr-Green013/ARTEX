@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
+import { MOCK } from "@/lib/mock/enabled";
+
 export default function Home() {
-  redirect("/function/tasks");
-  return <>Coming Soon</>;
+  redirect(MOCK ? "/dashboard" : "/function/tasks");
 }
