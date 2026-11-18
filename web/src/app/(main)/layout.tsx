@@ -3,10 +3,13 @@
 import type { ReactNode } from "react";
 import * as React from "react";
 
+import Link from "next/link";
+
 import { AppSidebar } from "@/app/(main)/_components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 import { getClientCookie } from "@/lib/cookie.client";
+import { MOCK } from "@/lib/mock/enabled";
 import {
   SIDEBAR_COLLAPSIBLE_VALUES,
   SIDEBAR_VARIANT_VALUES,
@@ -79,6 +82,17 @@ export default function Layout({ children }: Readonly<{ children: ReactNode }>) 
           "min-w-0 overflow-x-hidden",
         )}
       >
+        {MOCK && (
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-primary/20 border-b bg-primary/5 px-4 py-2 text-xs sm:px-6">
+            <p>
+              <span className="font-semibold">Demo mode</span>
+              <span className="text-muted-foreground"> · Synthetic data</span>
+            </p>
+            <Link href="/dashboard#demo-walkthrough" className="font-medium text-primary underline underline-offset-4">
+              Demo guide
+            </Link>
+          </div>
+        )}
         <MainContent>{children}</MainContent>
       </SidebarInset>
     </SidebarProvider>

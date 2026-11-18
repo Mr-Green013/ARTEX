@@ -3429,6 +3429,23 @@ export const interceptPending: InterceptPending[] = [
 
 export const interceptHistory: InterceptApprovalRow[] = [
   {
+    id: 95,
+    task_id: "t-acme-api",
+    agent_name: "work#2",
+    tool_name: "Write",
+    tool_input: {
+      path: "reports/evidence-summary.md",
+      content: "# Order access finding\nReview the baseline and proof, then verify the ownership check after remediation.",
+    },
+    status: "pending",
+    decision_source: "model",
+    reason: "Evidence summary request",
+    created_at: T("2026-07-26T08:05:00Z"),
+    conv_title: "",
+    conv_agent_key: "",
+    rule_name: "",
+  },
+  {
     id: 90,
     rule_id: 1,
     task_id: "t-acme-web",
@@ -3505,6 +3522,18 @@ interceptHistory.unshift({
 });
 
 export const interceptDetails: Record<number, InterceptAudit> = {
+  95: {
+    run_id: "demo-run-evidence-summary",
+    tool_use_id: "call-write-evidence-summary",
+    correlation: "exact",
+    input_digest: "0fc10834dca3b51996a45404f77e7e3ea6e720bd2f5219fa6e366db5d2891fbf",
+    user_message: "Summarize the order access finding using the recorded evidence.",
+    context: [],
+    captured_at: T("2026-07-26T08:05:00Z"),
+    initial_action: "ask",
+    initial_reason: "Review the evidence summary before writing it to the sample report.",
+    execution_status: "not_started",
+  },
   94: {
     run_id: "demo-run-report",
     tool_use_id: "call-write-report",
